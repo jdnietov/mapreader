@@ -3,4 +3,5 @@
 !*.*
 *.sh
 *.png
+!accident.png
 !Makefile
