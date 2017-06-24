@@ -1,8 +1,0 @@
-#!/bin/bash
-firefox 'https://www.google.com.co/maps/@4.7512149,-74.0711512,14z/data=!5m1!1e1?hl=es-419' &
-pid=$!
-echo $pid
-sleep 4
-wmctrl -a Firefox
-import -window "$(xdotool getwindowfocus -f)" $(date +%F_%H%M%S_%N).png
-kill $pid
