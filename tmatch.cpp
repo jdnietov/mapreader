@@ -2,6 +2,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 #include <stdio.h>
+#include "tmatch.h"
 
 using namespace std;
 using namespace cv;
@@ -13,28 +14,24 @@ char* result_window = "Result window";
 
 string template_name = "accident.png";
 
-int match_method;
-int max_Trackbar = 5;
+int match_method = 0;
 
 /// Function Headers
 void MatchingMethod( int, void* );
+int readAndMatch( char* );
 
 /** @function main */
-int main( int argc, char** argv )
+int readAndMatch( char* imgname )
 {
   /// Load image and template
-  img = imread( argv[1], 1 );
-  templ = imread( "accident.png", 1 );
+  img = imread( imgname, 1 );
+  templ = imread( template_name, 1 );
 
   /// Create windows
   namedWindow( image_window, CV_WINDOW_AUTOSIZE );
   namedWindow( result_window, CV_WINDOW_AUTOSIZE );
 
-  /// Create Trackbar
-  char* trackbar_label = "Method: \n 0: SQDIFF \n 1: SQDIFF NORMED \n 2: TM CCORR \n 3: TM CCORR NORMED \n 4: TM COEFF \n 5: TM COEFF NORMED";
-  createTrackbar( trackbar_label, image_window, &match_method, max_Trackbar, MatchingMethod );
-
-  MatchingMethod( 0, 0 );
+  MatchingMethod( 1, 0 );
 
   waitKey(0);
   return 0;
