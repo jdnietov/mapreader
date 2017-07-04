@@ -7,44 +7,46 @@
 
 using namespace std;
 
-const double DELTALAT = 0.016892;
-const double DELTALON = -0.032916;
+const double ZOOM = 16;
+const double LATDELTA = 0.016892;
+const double LONDELTA = -0.032916;
+
+void writeBash(ofstream &file, double lat, double lon) {
+  file << "google-chrome \'https://www.google.com.co/maps/@"
+    << lat << ","
+    << lon << ","
+    << ZOOM << "z/data=!5m1!1e1?hl=es-419\' &\n";
+  file << "pid=$!\n";
+  file << "sleep 4\n";
+  file << "wmctrl -a chrome\n";
+  file << "xdotool key Escape\nsleep 0.5\n";
+  file << "import -window \"$(xdotool getwindowfocus -f)\" $(date +%F_%H%M%S)_" << lat << "_" << lon << ".png\n";
+  file << "xdotool key Ctrl+w\n";
+}
 
 int main () {
-  const string mapZoom = "16";
+  cout << "executing"<< endl;
   double ini_lat = 4.8166031;
   double ini_lon = -74.0345367;
   ofstream bash;
 
-  bash.open ("script.sh");
-  bash.precision(9);
-  bash << "#!/bin/bash\n";
-
   cout.precision(9);
-  double lat = ini_lat;
-  double lon = ini_lon;
   for(int i = 0; i < LONTILES; i++) {
     for(int j = 0; j < LATTILES; j++) {
-      cout << lat << ", " << lon << endl;
+      bash.open ("script.sh");
+      bash << "#!/bin/bash\n";
+      bash.precision(9);
+      writeBash(bash, ini_lat, ini_lon);
+      bash.close();
 
-      bash << "google-chrome \'https://www.google.com.co/maps/@"
-        << lat << ","
-        << lon << ","
-        << mapZoom << "z/data=!5m1!1e1?hl=es-419\' &\n";
-      bash << "pid=$!\n";
-      bash << "sleep 4\n";
-      bash << "wmctrl -a chrome\n";
-      bash << "xdotool key Escape\nsleep 0.5\n";
-      bash << "import -window \"$(xdotool getwindowfocus -f)\" $(date +%F_%H%M%S)_" << lat << "_" << lon << ".png\n";
-      bash << "xdotool key Ctrl+w\n";
+      // run template matching
 
-      lat -= DELTALAT;
+      system("chmod +x script.sh");
+      system("./script.sh");
+      ini_lat -= LATDELTA;
     }
-    lon += DELTALON;
+    ini_lon += LONDELTA;
   }
-  bash.close();
 
-  system("chmod +x script.sh");
-  system("./script.sh");
   return 0;
 }
