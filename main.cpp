@@ -5,7 +5,7 @@
 #include <errno.h>
 #include "tmatch.h"
 #define LATTILES 1
-#define LONTILES 2
+#define LONTILES 1
 
 using namespace std;
 
@@ -13,36 +13,28 @@ const double ZOOM = 16;
 const double LATDELTA = 0.016892;
 const double LONDELTA = -0.032916;
 
-const char* IMGNAME = "img.png";
+const char* IMGNAME = "screenshot.png";
 
 int checkSystem(char* line) {
   int ret_val = system(line);
   if (ret_val == 0 && errno == 0)
   {
-    cout << line << ": sucess" << endl;
     return 1;
   }
-  cout << line << ": error" << endl;
+  cout << line << ": error running " << line << endl;
   return 0;
 }
 
 void writeBash(ofstream &file, double lat, double lon) {
-  // TODO change google-chrome bash to headless
-  file << "google-chrome \'https://www.google.com.co/maps/@"
-    << lat << ","
-    << lon << ","
-    << ZOOM << "z/data=!5m1!1e1?hl=es-419\' &\n";
-  file << "pid=$!\n";
-  file << "sleep 4\n";
-  file << "wmctrl -a chrome\n";
-  file << "xdotool key Escape\nsleep 0.5\n";
-  // file << "import -window \"$(xdotool getwindowfocus -f)\" $(date +%F_%H%M%S)_" << lat << "_" << lon << ".png\n";
-  file << "import -window \"$(xdotool getwindowfocus -f)\" " << IMGNAME << "\n";
-  file << "xdotool key Ctrl+w\n";
+  // TODO check --headless warnings
+  file << "google-chrome --headless --disable-gpu --screenshot --window-size=1920,1080 "
+    << "\'https://www.google.com.co/maps/@"
+      << lat << ","
+      << lon << ","
+      << ZOOM << "z\' &> /dev/null\n";
 }
 
 int main () {
-  cout << "executing"<< endl;
   double ini_lat = 4.8166031;
   double ini_lon = -74.0345367;
   ofstream bash;
@@ -74,10 +66,9 @@ int main () {
       ini_lat -= LATDELTA;
     }
     ini_lon += LONDELTA;
-  }
 
-  const char *filename = "test_accidents.png";
-  readAndMatch( (char*) filename );
+    readAndMatch( "test_accidents.png" );
+  }
 
   return 0;
 }
