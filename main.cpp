@@ -66,9 +66,9 @@ int main () {
       ini_lat -= LATDELTA;
     }
     ini_lon += LONDELTA;
-
-    readAndMatch( "test_accidents.png" );
   }
+
+  readAndMatch( "test_accidents.png" );
 
   return 0;
 }
