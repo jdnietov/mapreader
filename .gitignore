@@ -3,5 +3,6 @@
 !*.*
 *.sh
 *.png
+*.jpeg
 !accident.png
 !Makefile

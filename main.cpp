@@ -1,18 +1,22 @@
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>     /* system, NULL, EXIT_FAILURE */
+#include <stdlib.h>
 #include <string>
 #include <errno.h>
 #include "tmatch.h"
-#define LATTILES 1
-#define LONTILES 1
+#define Q 77
 
 using namespace std;
 
-const double ZOOM = 16;
-const double LATDELTA = 0.016892;
-const double LONDELTA = -0.032916;
+struct Location {
+  double lat;
+  double lon;
+};
 
+struct Location grid[Q];
+
+const double ZOOM = 16;
+const double DELTALAT = 0.0168704;
 const char* IMGNAME = "screenshot.png";
 
 int checkSystem(char* line) {
@@ -26,7 +30,6 @@ int checkSystem(char* line) {
 }
 
 void writeBash(ofstream &file, double lat, double lon) {
-  // TODO check --headless warnings
   file << "google-chrome --headless --disable-gpu --screenshot --window-size=1920,1080 "
     << "\'https://www.google.com.co/maps/@"
       << lat << ","
@@ -34,38 +37,51 @@ void writeBash(ofstream &file, double lat, double lon) {
       << ZOOM << "z\' &> /dev/null\n";
 }
 
+void fillGrid(int init, double iniLat, double iniLon, int n) {
+  grid[init].lat = iniLat;
+  grid[init].lon = iniLon;
+
+  ++init;
+  for(int j = init; j < init+n-1; j++) {
+    grid[j].lat = grid[j-1].lat - DELTALAT;
+    grid[j].lon = iniLon;
+  }
+}
+
+void initGrid() {
+  fillGrid(0, 4.8196776, -74.0258801, 9);
+  fillGrid(9, 4.7859368, -74.0587103, 13);
+  fillGrid(22, 4.7521960, -74.0915405, 17);
+  fillGrid(39, 4.7353256, -74.1243707, 16);
+  fillGrid(55, 4.7353256, -74.1572009, 13);
+  fillGrid(68, 4.6341032, -74.1900311, 5);
+  fillGrid(73, 4.6341032, -74.2228613, 4);
+}
+
 int main () {
-  double ini_lat = 4.8166031;
-  double ini_lon = -74.0345367;
   ofstream bash;
 
   cout.precision(9);
-  for(int i = 0; i < LONTILES; i++) {
-    for(int j = 0; j < LATTILES; j++) {
-      bash.open ("script.sh");
-      bash << "#!/bin/bash\n";
-      bash.precision(9);
-      writeBash(bash, ini_lat, ini_lon);
-      bash.close();
+  initGrid();
 
-      // run template matching
+  for(int i = 0; i < Q; i++) {
+    bash.open ("script.sh");
+    bash << "#!/bin/bash\n";
+    bash.precision(9);
+    writeBash(bash, grid[i].lat, grid[i].lon);
+    bash.close();
 
-      checkSystem( (char*)"chmod +x script.sh" );
-      checkSystem( (char*)"./script.sh" );
+    checkSystem( (char*)"chmod +x script.sh" );
+    checkSystem( (char*)"./script.sh" );
 
-      readAndMatch( (char*) IMGNAME );
+    readAndMatch( (char*) IMGNAME );
 
-      // delete img
-      bash.open ("script.sh");
-      bash << "#!/bin/bash\n";
-      bash << "rm " << IMGNAME << "\n";
-      bash.close();
+    bash.open ("script.sh");
+    bash << "#!/bin/bash\n";
+    bash << "rm " << IMGNAME << "\n";
+    bash.close();
 
-      checkSystem( (char*)"./script.sh" );
-
-      ini_lat -= LATDELTA;
-    }
-    ini_lon += LONDELTA;
+    checkSystem( (char*)"./script.sh" );
   }
 
   readAndMatch( "test_accidents.png" );
