@@ -9,6 +9,7 @@ using namespace cv;
 
 /// Global Variables
 Mat img; Mat templ; Mat result;
+Point maxPoint;
 char* image_window = "Source Image";
 // char* result_window = "Result window";
 
@@ -18,10 +19,10 @@ int match_method = 0;
 
 /// Function Headers
 void MatchingMethod( int, void* );
-int readAndMatch( char* );
+void * readAndMatch( char* );
 
 /** @function main */
-int readAndMatch( char* imgname )
+void * readAndMatch( char* imgname )
 {
   /// Load image and template
   img = imread( imgname, 1 );
@@ -34,14 +35,14 @@ int readAndMatch( char* imgname )
   MatchingMethod( 0, 0 );
 
   waitKey(0);
-  return 0;
+  return &maxPoint;
 }
 
 /**
  * @function MatchingMethod
  * @brief Trackbar callback
  */
- void MatchingMethod( int, void* )
+void MatchingMethod( int, void* )
  {
    /// Source image to display
    Mat img_display;
@@ -62,24 +63,22 @@ int readAndMatch( char* imgname )
    Point matchLoc;
    double minVal; double maxVal;
 
-  //  for(int k=1;k<=4;k++)
-  //  {
-     minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
-    //  result.at<float>(minLoc.x,minLoc.y)=1.0;
-    //  result.at<float>(maxLoc.x,maxLoc.y)=0.0;
+   minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
 
    /// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
    if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
-     { matchLoc = minLoc; }
-   else
-     { matchLoc = maxLoc; }
+    { matchLoc = minLoc; }
+    else
+    { matchLoc = maxLoc; }
 
-   /// Show me what you got
-   rectangle( img_display, matchLoc, Point( matchLoc.x + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
+  /// Show me what you got
+  maxPoint.x = matchLoc.x + templ.cols;
+  maxPoint.y = matchLoc.y + templ.rows;
+
+  rectangle( img_display, matchLoc, Point( matchLoc.x + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
   //  rectangle( result, matchLoc, Point( matchLoc.x + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
-  //  }
 
-   imshow( image_window, img_display );
+  imshow( image_window, img_display );
   //  imshow( result_window, result );
 
    return;
