@@ -29,12 +29,12 @@ void * readAndMatch( char* imgname )
   templ = imread( template_name, 1 );
 
   /// Create windows
-  namedWindow( image_window, CV_WINDOW_AUTOSIZE );
+  // namedWindow( image_window, CV_WINDOW_AUTOSIZE );
   // namedWindow( result_window, CV_WINDOW_AUTOSIZE );
 
   MatchingMethod( 0, 0 );
 
-  waitKey(0);
+  // waitKey(0);
   return &maxPoint;
 }
 

@@ -30,7 +30,6 @@ struct Location {
 ofstream bash, data;
 struct Location grid[Q];
 
-void printPoint(float x, float y);
 void getCoordinates(int pixelLng, int pixelLat, double lat, double lng, void *res);
 void chksyscall(char* line);
 void fillCol(int init, double iniLat, double iniLng, int n);
@@ -52,7 +51,7 @@ int main () {
 
   initGrid();
 
-  for(int i = 0; i < Q; i++) {
+  for(int i = 1; i <= Q; i++) {
     double lat = grid[i].lat, lng = grid[i].lng;
 
     bash.open ("script.sh");
@@ -74,22 +73,19 @@ int main () {
 
     data.open("data.log", ios::app);
     data << "(" << lat << ", " << lng << ")" << endl;
-    data << "-- [" << loc.lat << ", " << loc.lng << "]" << endl;
+    data << "-- [" << loc.lat << "," << loc.lng << "]" << endl;
+    if(i == Q)  data << endl;
     data.close();
 
-    bash.open ("script.sh");
-    bash << "#!/bin/bash\n";
-    bash << "rm " << IMGNAME << "\n";
-    bash.close();
+    // bash.open ("script.sh");
+    // bash << "#!/bin/bash\n";
+    // bash << "rm " << IMGNAME << "\n";
+    // bash.close();
 
     chksyscall( (char*)"./script.sh" );
   }
 
   return 0;
-}
-
-void printPoint(float x, float y) {
-  cout << "[" << x << "," << y << "]";
 }
 
 void getCoordinates(int pixelLng, int pixelLat, double lat, double lng, void *res) {
@@ -101,7 +97,7 @@ void getCoordinates(int pixelLng, int pixelLat, double lat, double lng, void *re
   double resLng = oLng + DELTALNG*((double) pixelLng/WINW);
 
   cout << "P: " << pixelLng << ", " << pixelLat << endl;
-  cout << "C: "; printPoint(resLat, resLng); cout << endl << endl;
+  cout << "C: " << "[" << resLat << "," << resLng << "]" << endl << endl;
 
   struct Location * locRes = (struct Location *) res;
   locRes->lat = resLat;
@@ -111,17 +107,17 @@ void getCoordinates(int pixelLng, int pixelLat, double lat, double lng, void *re
 void chksyscall(char* line) {
   int status = system(line);
   if (status < 0) {
-    std::cout << "Error: " << strerror(errno) << '\n';
+    cout << "Error: " << strerror(errno) << '\n';
     clean();
     exit(-1);
   }
   else
   {
     if (WIFEXITED(status)) {
-      std::cout << "Program returned normally, exit code " << WEXITSTATUS(status) << '\n';
+      // cout << "Program returned normally, exit code " << WEXITSTATUS(status) << '\n';
     } else {
       clean();
-      std::cout << "Program exited abnormally\n";
+      cout << "Program exited abnormally\n";
       exit(-1);
     }
   }
