@@ -7,21 +7,43 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #define Q 77
+#define WINW 1920
+#define WINH 1080
 
 using namespace std;
 using namespace cv;
 
 const double ZOOM = 16;
-const double DELTALAT = 0.0168704;
-const double DELTALON = 0.0328303;
+const double DELTALAT = 0.0168704;  // y-axis, increase upwards
+const double DELTALNG = 0.0328303;  // x-axis, decrease left
 const char* IMGNAME = "screenshot.png";
 
 struct Location {
+  int x;
+  int y;
   double lat;
-  double lon;
+  double lng;
 };
 
 struct Location grid[Q];
+
+void printPoint(float x, float y) {
+  cout << "[" << x << "," << y << "]";
+}
+
+void getCoordinates(int pixelLng, int pixelLat, double lat, double lng) {
+  // image's origin coordinates
+  double oLat = lat + DELTALAT/2;
+  double oLng = lng - DELTALNG/2;
+
+  double resLat = oLat - DELTALAT*((double) pixelLat/WINH);
+  double resLng = oLng + DELTALNG*((double) pixelLng/WINW);
+
+  // cout << (double) pixelLat/WINH << ", " << pixelLng/WINW << endl;
+  cout << "P: " << pixelLng << ", " << pixelLat << endl;
+  cout << "C: "; printPoint(resLat, resLng); cout << endl << endl;
+}
+
 
 int chkSysCall(char* line) {
   int ret_val = system(line);
@@ -33,22 +55,21 @@ int chkSysCall(char* line) {
   return 0;
 }
 
-void writeBash(ofstream &file, double lat, double lon) {
-  file << "google-chrome --headless --disable-gpu --screenshot --window-size=1920,1080 "
-    << "\'https://www.google.com.co/maps/@"
-      << lat << ","
-      << lon << ","
+void writeBash(ofstream &file, double lat, double lng) {
+  file << "google-chrome --headless --disable-gpu --screenshot --window-size="
+      << WINW << "," << WINH
+      << " \'https://www.google.com.co/maps/@" << lat << "," << lng << ","
       << ZOOM << "z/data=!5m1!1e1?hl=es-419\' &> /dev/null\n";
 }
 
-void fillCol(int init, double iniLat, double iniLon, int n) {
+void fillCol(int init, double iniLat, double iniLng, int n) {
   grid[init].lat = iniLat;
-  grid[init].lon = iniLon;
+  grid[init].lng = iniLng;
 
   ++init;
   for(int j = init; j < init+n-1; j++) {
     grid[j].lat = grid[j-1].lat - DELTALAT;
-    grid[j].lon = iniLon;
+    grid[j].lng = iniLng;
   }
 }
 
@@ -65,13 +86,20 @@ void initGrid() {
 int main () {
   ofstream bash;
 
+  bash.precision(9);
+  cout.precision(9);
+
   initGrid();
 
   for(int i = 0; i < Q; i++) {
+    double lat = grid[i].lat, lng = grid[i].lng;
+    cout << "---";
+    printPoint(lat, lng);
+    cout << "---" << endl;
+
     bash.open ("script.sh");
     bash << "#!/bin/bash\n";
-    bash.precision(9);
-    writeBash(bash, grid[i].lat, grid[i].lon);
+    writeBash(bash, lat, lng);
     bash.close();
 
     chkSysCall( (char*)"chmod +x script.sh" );
@@ -79,9 +107,7 @@ int main () {
 
     Point * p_point;
     p_point = (Point*) readAndMatch( (char*) IMGNAME );
-    cout << "[" << p_point->x << ", " << p_point->y << "]" << endl;
-
-    // TODO get coordinates from point in image
+    getCoordinates(p_point->x, p_point->y, lat, lng);
 
     bash.open ("script.sh");
     bash << "#!/bin/bash\n";

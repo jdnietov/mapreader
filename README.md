@@ -14,5 +14,5 @@ sudo apt-get install xdotool wmctrl imagemagick google-chrome
 In your machine, type from a terminal:
 ```
 make
-./write_script
+./mapRead
 ```

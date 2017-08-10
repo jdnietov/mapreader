@@ -64,7 +64,7 @@ void MatchingMethod( int, void* )
    double minVal; double maxVal;
 
    minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
-   cout << "minVal: " << minVal << ", maxVal: " << maxVal << endl;
+  //  cout << "minVal: " << minVal << ", maxVal: " << maxVal << endl;
 
    /// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
    if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
