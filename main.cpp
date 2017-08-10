@@ -14,7 +14,7 @@ using namespace cv;
 const double ZOOM = 16;
 const double DELTALAT = 0.0168704;
 const double DELTALON = 0.0328303;
-const char* IMGNAME = "test_accidents.png";
+const char* IMGNAME = "screenshot.png";
 
 struct Location {
   double lat;
@@ -67,15 +67,15 @@ int main () {
 
   initGrid();
 
-  // for(int i = 0; i < Q; i++) {
-  //   bash.open ("script.sh");
-  //   bash << "#!/bin/bash\n";
-  //   bash.precision(9);
-  //   writeBash(bash, grid[i].lat, grid[i].lon);
-  //   bash.close();
+  for(int i = 0; i < Q; i++) {
+    bash.open ("script.sh");
+    bash << "#!/bin/bash\n";
+    bash.precision(9);
+    writeBash(bash, grid[i].lat, grid[i].lon);
+    bash.close();
 
-    // chkSysCall( (char*)"chmod +x script.sh" );
-    // chkSysCall( (char*)"./script.sh" );
+    chkSysCall( (char*)"chmod +x script.sh" );
+    chkSysCall( (char*)"./script.sh" );
 
     Point * p_point;
     p_point = (Point*) readAndMatch( (char*) IMGNAME );
@@ -83,13 +83,13 @@ int main () {
 
     // TODO get coordinates from point in image
 
-    // bash.open ("script.sh");
-    // bash << "#!/bin/bash\n";
-    // bash << "rm " << IMGNAME << "\n";
-    // bash.close();
-    //
-    // chkSysCall( (char*)"./script.sh" );
-  // }
+    bash.open ("script.sh");
+    bash << "#!/bin/bash\n";
+    bash << "rm " << IMGNAME << "\n";
+    bash.close();
+
+    chkSysCall( (char*)"./script.sh" );
+  }
 
   return 0;
 }

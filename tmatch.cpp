@@ -11,11 +11,11 @@ using namespace cv;
 Mat img; Mat templ; Mat result;
 Point maxPoint;
 char* image_window = "Source Image";
-char* result_window = "Result window";
+// char* result_window = "Result window";
 
 string template_name = "accident.png";
 
-int match_method = 1;
+int match_method = 0;
 
 /// Function Headers
 void MatchingMethod( int, void* );
@@ -30,7 +30,7 @@ void * readAndMatch( char* imgname )
 
   /// Create windows
   namedWindow( image_window, CV_WINDOW_AUTOSIZE );
-  namedWindow( result_window, CV_WINDOW_AUTOSIZE );
+  // namedWindow( result_window, CV_WINDOW_AUTOSIZE );
 
   MatchingMethod( 0, 0 );
 
@@ -77,10 +77,10 @@ void MatchingMethod( int, void* )
   maxPoint.y = matchLoc.y + templ.rows;
 
   rectangle( img_display, matchLoc, Point( matchLoc.x + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
-   rectangle( result, matchLoc, Point( matchLoc.x + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
+  // rectangle( result, matchLoc, Point( matchLoc.x + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
 
   imshow( image_window, img_display );
-   imshow( result_window, result );
+  // imshow( result_window, result );
 
    return;
  }
