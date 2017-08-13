@@ -66,7 +66,8 @@ int main () {
     chksyscall( (char*)"./script.sh" );
 
     Point * p_point;
-    p_point = (Point*) readAndMatch( (char*) IMGNAME );
+    vector<Point> points;
+    p_point = (Point*) readAndMatch( (char*) IMGNAME, &points );
 
     struct Location loc;
     getCoordinates(p_point->x, p_point->y, lat, lng, &loc);
