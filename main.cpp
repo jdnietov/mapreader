@@ -17,9 +17,15 @@
 using namespace std;
 using namespace cv;
 
-const double ZOOM = 16;
-const double DELTALAT = 0.0168704;  // y-axis, increase upwards
-const double DELTALNG = 0.0328303;  // x-axis, decrease left
+/*
+ * DELTALAT and DELTALNG values are fixed for a 1920 x 1080 screen
+ * running a 100%-zoom Google Chrome window, with a 16z map zoom
+ * in Ubuntu 16.04.
+*/
+const int ZOOM = 16;
+const int PRECISION = 9;
+const double DELTALAT = 0.020891;  // y-axis, increase upwards
+const double DELTALNG = 0.040962;  // x-axis, decrease left
 const char* IMGNAME = "screenshot.png";
 
 struct Location {
@@ -30,21 +36,21 @@ struct Location {
 ofstream bash, data;
 struct Location grid[Q];
 
-void getCoordinates(int pixelLng, int pixelLat, double lat, double lng, void *res);
-void chksyscall(char* line);
-void fillCol(int init, double iniLat, double iniLng, int n);
-void initGrid();
 string currentDateTime();
-void signalHandler( int signum );
+void chksyscall(char* line);
 void clean();
+void fillCol(int init, double iniLat, double iniLng, int n);
+void getCoordinates(int pixelLng, int pixelLat, double lat, double lng, void *res);
+void initGrid();
 void printPoint(ofstream *ofs, float x, float y);
+void signalHandler( int signum );
 
 int main () {
   signal(SIGINT, signalHandler);
 
-  bash.precision(9);
-  data.precision(9);
-  cout.precision(9);
+  bash.precision(PRECISION);
+  data.precision(PRECISION);
+  cout.precision(PRECISION);
 
   data.open("data.log", ios::app);
   data << "*** " << currentDateTime() << " ***" << endl << endl;
@@ -70,18 +76,21 @@ int main () {
 
     readAndMatch( (char*) IMGNAME, &points );
 
-    data.open("data.log", ios::app);
-    data << "(" << lat << "," << lng << ")" << endl;
-    for(vector<Point>::const_iterator pos = points.begin(); pos != points.end(); ++pos) {
-      // cout << *pos << ' ';
-      getCoordinates(pos->x, pos->y, lat, lng, &loc);
-      cout << "C: " << "[" << loc.lat << "," << loc.lng << "]" << endl << endl;
-      data << " |-- " << loc.lat << "," << loc.lng << endl;
-      if(i == Q)  data << endl;
-    }
-    data.close();
+    // FIXME matchTemplate gives misplaced perfect match
+    if(points.size() != 1 || points.at(0).x != 309 || points.at(0).y != 22) { // just a workaround
+      data.open("data.log", ios::app);
+      data << "(" << lat << "," << lng << ")" << endl;
 
-    chksyscall( (char*)"./script.sh" );
+      for(vector<Point>::const_iterator pos = points.begin(); pos != points.end(); ++pos) {
+        getCoordinates(pos->x, pos->y, lat, lng, &loc);
+        cout << " |-- " << loc.lat << "," << loc.lng << endl;
+        data << " |-- " << loc.lat << "," << loc.lng << endl;
+        if((pos+1) == points.end())  data << endl;
+      }
+
+      data.close();
+      cout << endl;
+    }
   }
 
   return 0;
