@@ -8,19 +8,14 @@ using namespace std;
 using namespace cv;
 
 /// Global Variables
-Mat img; Mat img_gray; Mat templ; Mat result;
+Mat img; Mat templ; Mat result;
 Point maxPoint;
 char* image_window = "Source Image";
-// char* result_window = "Result window";
 
 string template_name = "accident.png";
 
 int match_method = CV_TM_CCOEFF_NORMED;
-float threshold_min = 0.05; float threshold_max = 0.95;
-
-/// Function Headers
-void MatchingMethod( int, void* );
-void * readAndMatch( char*, void * );
+float threshold_min = 0.007; float threshold_max = 0.95;
 
 string type2str(int type) {
   string r;
@@ -56,30 +51,16 @@ bool doesMatch(float f) {
   return false;
 }
 
-void * readAndMatch( char* imgname )
+void * readAndMatch( char* imgname, void *out )
 {
   /// Load image and template
   img = imread( imgname );
   templ = imread( template_name, 1 );
-  cvtColor(img, img_gray, COLOR_BGR2GRAY);
+  vector<Point> *vec = (vector <Point> *) out;
 
   /// Create windows
   namedWindow( image_window, CV_WINDOW_AUTOSIZE );
-  // namedWindow( result_window, CV_WINDOW_AUTOSIZE );
 
-  MatchingMethod( 0, 0 );
-
-  waitKey(0);
-
-  return &maxPoint;
-}
-
-/**
- * @function MatchingMethod
- * @brief Trackbar callback
- */
-void MatchingMethod( int, void* ) {
-  /// Source image to display
   Mat img_display;
   img.copyTo( img_display );
 
@@ -102,11 +83,15 @@ void MatchingMethod( int, void* ) {
             Point(j + templ.cols , i + templ.rows ),
             Scalar::all(0), 2, 8, 0
          );
+
+         vec->push_back(Point(j, i));
        }
      }
    }
 
   imshow( image_window, img_display );
 
-  return;
+  waitKey(0);
+
+  return &maxPoint;
 }

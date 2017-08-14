@@ -37,6 +37,7 @@ void initGrid();
 string currentDateTime();
 void signalHandler( int signum );
 void clean();
+void printPoint(ofstream *ofs, float x, float y);
 
 int main () {
   signal(SIGINT, signalHandler);
@@ -53,6 +54,8 @@ int main () {
 
   for(int i = 1; i <= Q; i++) {
     double lat = grid[i].lat, lng = grid[i].lng;
+    struct Location loc;
+    vector<Point> points;
 
     bash.open ("script.sh");
     bash << "#!/bin/bash\n";
@@ -65,23 +68,18 @@ int main () {
     chksyscall( (char*)"chmod +x script.sh" );
     chksyscall( (char*)"./script.sh" );
 
-    Point * p_point;
-    vector<Point> points;
-    p_point = (Point*) readAndMatch( (char*) IMGNAME, &points );
-
-    struct Location loc;
-    getCoordinates(p_point->x, p_point->y, lat, lng, &loc);
+    readAndMatch( (char*) IMGNAME, &points );
 
     data.open("data.log", ios::app);
-    data << "(" << lat << ", " << lng << ")" << endl;
-    data << "-- [" << loc.lat << "," << loc.lng << "]" << endl;
-    if(i == Q)  data << endl;
+    data << "(" << lat << "," << lng << ")" << endl;
+    for(vector<Point>::const_iterator pos = points.begin(); pos != points.end(); ++pos) {
+      // cout << *pos << ' ';
+      getCoordinates(pos->x, pos->y, lat, lng, &loc);
+      cout << "C: " << "[" << loc.lat << "," << loc.lng << "]" << endl << endl;
+      data << " |-- " << loc.lat << "," << loc.lng << endl;
+      if(i == Q)  data << endl;
+    }
     data.close();
-
-    // bash.open ("script.sh");
-    // bash << "#!/bin/bash\n";
-    // bash << "rm " << IMGNAME << "\n";
-    // bash.close();
 
     chksyscall( (char*)"./script.sh" );
   }
@@ -96,9 +94,6 @@ void getCoordinates(int pixelLng, int pixelLat, double lat, double lng, void *re
 
   double resLat = oLat - DELTALAT*((double) pixelLat/WINH);
   double resLng = oLng + DELTALNG*((double) pixelLng/WINW);
-
-  cout << "P: " << pixelLng << ", " << pixelLat << endl;
-  cout << "C: " << "[" << resLat << "," << resLng << "]" << endl << endl;
 
   struct Location * locRes = (struct Location *) res;
   locRes->lat = resLat;
@@ -165,6 +160,13 @@ void signalHandler( int signum ) {
 }
 
 void clean() {
-  bash.close();
+  data.open("data.log", ios::app);
+  data << endl;
   data.close();
+
+  bash.close();
+}
+
+void printPoint(ofstream *ofs, float x, float y) {
+  *ofs << x << y;
 }
