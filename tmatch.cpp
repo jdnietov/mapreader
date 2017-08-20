@@ -10,7 +10,7 @@ using namespace cv;
 Mat img; Mat templ; Mat result;
 
 int match_method = CV_TM_CCOEFF_NORMED;
-float threshold_min = 0.007; float threshold_max = 0.95;
+float threshold_min = 0.007; float threshold_max = 0.80;
 
 char* image_window = "Source Image";
 string template_name = "accident.png";
@@ -32,7 +32,7 @@ void readAndMatch( char* imgname, void *out )
 
   /// Create windows
   // namedWindow( image_window, CV_WINDOW_AUTOSIZE );
-
+  //
   // Mat img_display;
   // img.copyTo( img_display );
 
@@ -42,27 +42,28 @@ void readAndMatch( char* imgname, void *out )
 
   /// Do the Matching and Normalize
   matchTemplate( img, templ, result, match_method );
-  normalize( result, result, 0, 1, NORM_MINMAX, -1, Mat() );
+  // normalize( result, result, 0, 1, NORM_MINMAX, -1, Mat() );
 
+  float max = 0;
   for(int i = 0; i < result_rows; i++) {
     for(int j = 0; j < result_cols; j++) {
       float res = result.at<float>(i,j);
-        if(doesMatch(res)) {
-          if(j != 309 && i != 22)
-            cout << "(" << j << ", " << i << "): " << res << endl;
-          // rectangle( img_display,
-          //   Point(j, i),
-          //   Point(j + templ.cols , i + templ.rows ),
-          //   Scalar::all(0), 2, 8, 0
-          // );
+      if(res > max) max = res;
+      if(doesMatch(res)) {
+        cout << "(" << j << ", " << i << "): " << res << endl;
+        // rectangle( img_display,
+        //   Point(j, i),
+        //   Point(j + templ.cols , i + templ.rows ),
+        //   Scalar::all(0), 2, 8, 0
+        // );
 
-          vec->push_back(Point(j, i));
-       }
-     }
-   }
+        vec->push_back(Point(j, i));
+      }
+    }
+  }
 
   // imshow( image_window, img_display );
-
+  //
   // waitKey(0);
 
   return;

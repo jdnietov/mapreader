@@ -76,8 +76,8 @@ int main () {
 
     readAndMatch( (char*) IMGNAME, &points );
 
-    // FIXME matchTemplate gives misplaced perfect match
-    if(points.size() != 1 || points.at(0).x != 309 || points.at(0).y != 22) { // just a workaround
+    if(points.size() >= 1) {
+      cout << points.size() << endl;
       data.open("data.log", ios::app);
       data << "(" << lat << "," << lng << ")" << endl;
 
