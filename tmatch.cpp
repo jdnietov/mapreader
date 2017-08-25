@@ -7,7 +7,7 @@
 using namespace std;
 using namespace cv;
 
-Mat img; Mat templ; Mat result;
+Mat img; Mat img_display; Mat templ; Mat result;
 
 int match_method = CV_TM_CCOEFF_NORMED;
 float threshold_min = 0.007; float threshold_max = 0.80;
@@ -23,7 +23,7 @@ bool doesMatch(float f) {
   }
 }
 
-void readAndMatch( char* imgname, void *out )
+void readAndMatch( char* imgname, void *out, bool graphic )
 {
   /// Load image and template
   img = imread( imgname );
@@ -31,10 +31,10 @@ void readAndMatch( char* imgname, void *out )
   vector<Point> *vec = (vector<Point> *) out;
 
   /// Create windows
-  // namedWindow( image_window, CV_WINDOW_AUTOSIZE );
-  //
-  // Mat img_display;
-  // img.copyTo( img_display );
+  if(graphic) {
+    namedWindow( image_window, CV_WINDOW_AUTOSIZE );
+    img.copyTo( img_display );
+  }
 
   /// Create the result matrix
   int result_cols =  img.cols - templ.cols + 1;
@@ -51,20 +51,23 @@ void readAndMatch( char* imgname, void *out )
       if(res > max) max = res;
       if(doesMatch(res)) {
         cout << "(" << j << ", " << i << "): " << res << endl;
-        // rectangle( img_display,
-        //   Point(j, i),
-        //   Point(j + templ.cols , i + templ.rows ),
-        //   Scalar::all(0), 2, 8, 0
-        // );
+        if(graphic) {
+          rectangle( img_display,
+            Point(j, i),
+            Point(j + templ.cols , i + templ.rows ),
+            Scalar::all(0), 2, 8, 0
+          );
+        }
 
         vec->push_back(Point(j, i));
       }
     }
   }
 
-  // imshow( image_window, img_display );
-  //
-  // waitKey(0);
+  if(graphic && max >= threshold_max) {
+    imshow( image_window, img_display );
+    waitKey(0);
+  }
 
   return;
 }

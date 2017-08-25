@@ -22,17 +22,19 @@ using namespace cv;
  * running a 100%-zoom Google Chrome window, with a 16z map zoom
  * in Ubuntu 16.04.
 */
-const int ZOOM = 16;
-const int PRECISION = 9;
-const double DELTALAT = 0.020891;  // y-axis, increase upwards
-const double DELTALNG = 0.040962;  // x-axis, decrease left
-const char* IMGNAME = "screenshot.png";
+const int    ZOOM      = 16;
+const int    PRECISION = 9;
+const int    DLOAD     = 5;         // progress bar module
+const double DELTALAT  = 0.020891;  // y-axis, increase upwards
+const double DELTALNG  = 0.040962;  // x-axis, decrease left
+const char*  IMGNAME   = "screenshot.png";
 
 struct Location {
   double lat;
   double lng;
 };
 
+bool isGraphic;
 ofstream bash, data;
 struct Location grid[Q];
 
@@ -45,7 +47,15 @@ void initGrid();
 void printPoint(ofstream *ofs, float x, float y);
 void signalHandler( int signum );
 
-int main () {
+int main (int argc, char* argv[]) {
+  if(argc > 1) {
+    for(int i = 1; i < argc; i++) {
+      isGraphic = strcmp(argv[i], (char *)"--graphic") == 0;
+      if(isGraphic)
+        break;
+    }
+  }
+
   signal(SIGINT, signalHandler);
 
   bash.precision(PRECISION);
@@ -58,7 +68,17 @@ int main () {
 
   initGrid();
 
+  int load = 0; // local variable for progress bar
   for(int i = 1; i <= Q; i++) {
+    // print progress bar
+    if(((i+1)*100/Q) >= load) {
+      cout << load << "% " << (load/10 == 0 ? " " : "") << "[";
+      for(int j = 0; j < load; j+=DLOAD) cout << "==";
+      for(int j = load; j < 100; j+=DLOAD)  cout << "  ";
+      cout << "]" << endl;
+      load+=DLOAD;
+    }
+
     double lat = grid[i].lat, lng = grid[i].lng;
     struct Location loc;
     vector<Point> points;
@@ -74,10 +94,9 @@ int main () {
     chksyscall( (char*)"chmod +x script.sh" );
     chksyscall( (char*)"./script.sh" );
 
-    readAndMatch( (char*) IMGNAME, &points );
+    readAndMatch( (char*) IMGNAME, &points, isGraphic );
 
     if(points.size() >= 1) {
-      cout << points.size() << endl;
       data.open("data.log", ios::app);
       data << "(" << lat << "," << lng << ")" << endl;
 

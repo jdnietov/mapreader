@@ -1,10 +1,8 @@
 *
-!/**/
-!*.*
-*.sh
-*.png
-*.jpeg
-*.log
+!.gitignore
+!*.cpp
+!*.h
+!*.md
 !test_accidents.png
 !accident.png
-!Makefile
+!*/
