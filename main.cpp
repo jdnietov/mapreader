@@ -32,7 +32,7 @@ const int    ZOOM      = 16;
 const int    PRECISION = 9;
 const int    DLOAD     = 5;         // progress bar module
 const double DELTALAT  = 0.022989;  // y-axis, increase upwards
-const double DELTALNG  = 0.040962;  // x-axis, decrease left
+const double DELTALNG  = 0.041156;  // x-axis, decrease left
 const char*  IMGNAME   = "screenshot.png";
 
 struct Location {
