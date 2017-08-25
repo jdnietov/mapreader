@@ -22,7 +22,12 @@ using namespace cv;
  * DELTALAT and DELTALNG values are fixed for a 1920 x 1080 screen
  * running a 100%-zoom Google Chrome window, with a 16z map zoom
  * in Ubuntu 16.04.
+
+ TODO work on a solution to improve accuracy. Current error margins are:
+ * lat error: +-0.00001319
+ * lng error: +-0.0000742
 */
+
 const int    ZOOM      = 16;
 const int    PRECISION = 9;
 const int    DLOAD     = 5;         // progress bar module
@@ -64,7 +69,7 @@ int main (int argc, char* argv[]) {
   cout.precision(PRECISION);
 
   data.open("data.log", ios::app);
-  data << "*** " << currentDateTime() << " ***" << endl << endl;
+  data << "*** " << currentDateTime() << " ***" << endl;
   data.close();
 
   initGrid();
@@ -73,10 +78,10 @@ int main (int argc, char* argv[]) {
   for(int i = 1; i <= Q; i++) {
     // print progress bar
     if(((i+1)*100/Q) >= load) {
-      cout << load << "% " << (load/10 == 0 ? " " : "") << "[";
+      cout << "[";
       for(int j = 0; j < load; j+=DLOAD) cout << "==";
       for(int j = load; j < 100; j+=DLOAD)  cout << "  ";
-      cout << "]" << endl;
+      cout << "] " << load << "%" << endl;
       load+=DLOAD;
     }
 
@@ -99,12 +104,10 @@ int main (int argc, char* argv[]) {
 
     if(points.size() >= 1) {
       data.open("data.log", ios::app);
-      data << "(" << lat << "," << lng << ")" << endl;
-
       for(vector<Point>::const_iterator pos = points.begin(); pos != points.end(); ++pos) {
         getCoordinates(pos->x+ICON/2, pos->y+ICON/2, lat, lng, &loc);
         cout << " |-- " << loc.lat << "," << loc.lng << endl;
-        data << " |-- " << loc.lat << "," << loc.lng << endl;
+        data << loc.lat << "," << loc.lng << endl;
         if((pos+1) == points.end())  data << endl;
       }
 
