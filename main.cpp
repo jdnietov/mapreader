@@ -10,7 +10,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-#define Q 77
+#define Q    71
+#define ICON 15
 #define WINW 1920
 #define WINH 1080
 
@@ -25,7 +26,7 @@ using namespace cv;
 const int    ZOOM      = 16;
 const int    PRECISION = 9;
 const int    DLOAD     = 5;         // progress bar module
-const double DELTALAT  = 0.020891;  // y-axis, increase upwards
+const double DELTALAT  = 0.022989;  // y-axis, increase upwards
 const double DELTALNG  = 0.040962;  // x-axis, decrease left
 const char*  IMGNAME   = "screenshot.png";
 
@@ -101,7 +102,7 @@ int main (int argc, char* argv[]) {
       data << "(" << lat << "," << lng << ")" << endl;
 
       for(vector<Point>::const_iterator pos = points.begin(); pos != points.end(); ++pos) {
-        getCoordinates(pos->x, pos->y, lat, lng, &loc);
+        getCoordinates(pos->x+ICON/2, pos->y+ICON/2, lat, lng, &loc);
         cout << " |-- " << loc.lat << "," << loc.lng << endl;
         data << " |-- " << loc.lat << "," << loc.lng << endl;
         if((pos+1) == points.end())  data << endl;
@@ -159,13 +160,13 @@ void fillCol(int init, double iniLat, double iniLng, int n) {
 }
 
 void initGrid() {
-  fillCol(0, 4.8196776, -74.0258801, 9);
-  fillCol(9, 4.7859368, -74.0587103, 13);
-  fillCol(22, 4.7521960, -74.0915405, 17);
-  fillCol(39, 4.7353256, -74.1243707, 16);
-  fillCol(55, 4.7353256, -74.1572009, 13);
-  fillCol(68, 4.6341032, -74.1900311, 5);
-  fillCol(73, 4.6341032, -74.2228613, 4);
+  fillCol(0, 4.8196776, -74.0258801, 7);
+  fillCol(7, 4.7859368, -74.0668421, 11);
+  fillCol(18, 4.7521960, -74.1078041, 15);
+  fillCol(33, 4.7353256, -74.1487661, 16);
+  fillCol(49, 4.7353256, -74.1897281, 13);
+  fillCol(62, 4.6341032, -74.2306901, 5);
+  fillCol(67, 4.6341032, -74.2716521, 4);
 }
 
 string currentDateTime() {

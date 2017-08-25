@@ -1,18 +1,46 @@
-## Synopsis
+# MapReader
 
-Image processing and automation project to analyze city traffic in Bogotá.
+ Fetch the coordinates of accidents displayed on a Google Maps for Bogotá, Colombia.
 
-## Installation
+## Getting Started
 
-Clone the repository.
-Check if you have all your dependencies installed. To install all required packages, type
+This program is specifically designed for a 1920 x 1080 screen running a 100%-zoom Google Chrome window with a 16z Google Map.
+
+For a more complete version you can also check out [WazeReader](https://github.com/jdnietov/wazereader), which uses Waze and fetches many other events on the map.
+
+### Prerequisites
+
+- Bash script interpreter
+- G++ compiler
+- Google Chrome +59.0 (uses `--headless` flag)
+- OpenCV 2.4 (for installing you can follow the [official instructions](http://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html) -- or use [these](https://github.com/jayrambayrambhia/Install-OpenCV) handy scripts)
+
+## Installing
+
+Clone the repository in your machine and run
 
 ```
-sudo apt-get install xdotool wmctrl imagemagick google-chrome
-```
-
-In your machine, type from a terminal:
-```
+cd mapReader/
 make
-./mapRead
 ```
+
+## Usage
+
+```
+./mapReader [--graphic]
+```
+
+All results will be written to a `data.log` file.
+- You can add a `--graphic` flag to display results on a window.
+
+## Authors
+
+* **José David Nieto Vitola** - *Initial work* - [jdnietov](https://github.com/jdnietov)
+
+## License
+
+This project is licensed under the MIT License.
+
+## Acknowledgments
+
+* [WazeReader](https://github.com/jdnietov/mapreader), a more complete version using Waze, is based upon this project (no, I didn't know what forking was when I wrote these). It also fetches traffic jams, hazards and many other events. Take a look if you're interested.

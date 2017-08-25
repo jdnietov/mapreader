@@ -10,7 +10,7 @@ using namespace cv;
 Mat img; Mat img_display; Mat templ; Mat result;
 
 int match_method = CV_TM_CCOEFF_NORMED;
-float threshold_min = 0.007; float threshold_max = 0.80;
+float threshold_min = 0.007; float threshold_max = 0.97;
 
 char* image_window = "Source Image";
 string template_name = "accident.png";
