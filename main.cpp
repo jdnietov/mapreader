@@ -23,12 +23,12 @@ using namespace cv;
  * running a 100%-zoom Google Chrome window, with a 16z map zoom
  * in Ubuntu 16.04.
 
- TODO work on a solution to improve accuracy. Current error margins are:
+ TODO: work on a solution to improve accuracy. Current error margins are:
  * lat error: +-0.00001319
  * lng error: +-0.0000742
 */
 
-const int    ZOOM      = 16;
+const int    ZOOM      = 15;
 const int    PRECISION = 9;
 const int    DLOAD     = 5;         // progress bar module
 const double DELTALAT  = 0.022989;  // y-axis, increase upwards
@@ -40,7 +40,7 @@ struct Location {
   double lng;
 };
 
-bool isGraphic;
+bool graphicMode, debugMode;
 ofstream bash, data;
 struct Location grid[Q];
 
@@ -55,14 +55,17 @@ void signalHandler( int signum );
 
 int main (int argc, char* argv[]) {
   if(argc > 1) {
+    graphicMode = false;    
+    debugMode = false;
+
     for(int i = 1; i < argc; i++) {
-      isGraphic = strcmp(argv[i], (char *)"--graphic") == 0;
-      if(isGraphic)
-        break;
+      graphicMode = graphicMode || strcmp(argv[i], (char *)"--graphic") == 0;
+      debugMode = debugMode || strcmp(argv[i], (char *)"--debug") == 0;
     }
   }
 
-  signal(SIGINT, signalHandler);
+  signal(SIGABRT, signalHandler);
+  signal(SIGTERM, signalHandler);
 
   bash.precision(PRECISION);
   data.precision(PRECISION);
@@ -100,7 +103,7 @@ int main (int argc, char* argv[]) {
     chksyscall( (char*)"chmod +x script.sh" );
     chksyscall( (char*)"./script.sh" );
 
-    readAndMatch( (char*) IMGNAME, &points, isGraphic );
+    readAndMatch( (char*) IMGNAME, &points, graphicMode, debugMode );
 
     if(points.size() >= 1) {
       data.open("data.log", ios::app);
@@ -145,7 +148,7 @@ void chksyscall(char* line) {
       // cout << "Program returned normally, exit code " << WEXITSTATUS(status) << '\n';
     } else {
       clean();
-      cout << "Program exited abnormally\n";
+      cout << "Call to " << line << " was interrupted. Returned code " << WEXITSTATUS(status) << "\n";
       exit(-1);
     }
   }

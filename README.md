@@ -27,11 +27,12 @@ make
 ## Usage
 
 ```
-./mapReader [--graphic]
+./mapReader [--graphic, --debug]
 ```
 
 All results will be written to a `data.log` file.
-- You can add a `--graphic` flag to display results on a window.
+- The `--graphic` flag allows to display match results on a window.
+- The `--debug` flag displays every screenshot the browser fetches, regardless of the matches in it, in order to monitor what the program is using.
 
 ## Authors
 
@@ -43,4 +44,4 @@ This project is licensed under the MIT License.
 
 ## Acknowledgments
 
-* [WazeReader](https://github.com/jdnietov/mapreader), a more complete version using Waze, is based upon this project (no, I didn't know what forking was when I wrote these). It also fetches traffic jams, hazards and many other events. Take a look if you're interested.
+* [WazeReader](https://github.com/jdnietov/mapreader), a more complete version using Waze, is based upon this project (no, I didn't know what forking in Github was when I wrote these). It also fetches traffic jams, hazards and many other events. Take a look if you're interested.

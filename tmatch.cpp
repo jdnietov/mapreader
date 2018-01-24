@@ -23,7 +23,7 @@ bool doesMatch(float f) {
   }
 }
 
-void readAndMatch( char* imgname, void *out, bool graphic )
+void readAndMatch( char* imgname, void *out, bool graphic, bool debug )
 {
   /// Load image and template
   img = imread( imgname );
@@ -31,7 +31,7 @@ void readAndMatch( char* imgname, void *out, bool graphic )
   vector<Point> *vec = (vector<Point> *) out;
 
   /// Create windows
-  if(graphic) {
+  if(graphic || debug) {
     namedWindow( image_window, CV_WINDOW_AUTOSIZE );
     img.copyTo( img_display );
   }
@@ -51,7 +51,7 @@ void readAndMatch( char* imgname, void *out, bool graphic )
       if(res > max) max = res;
       if(doesMatch(res)) {
         cout << "(" << j << ", " << i << "): " << res << endl;
-        if(graphic) {
+        if(graphic || debug) {
           rectangle( img_display,
             Point(j, i),
             Point(j + templ.cols , i + templ.rows ),
@@ -64,7 +64,7 @@ void readAndMatch( char* imgname, void *out, bool graphic )
     }
   }
 
-  if(graphic && max >= threshold_max) {
+  if((graphic && max >= threshold_max) || debug) {
     imshow( image_window, img_display );
     waitKey(0);
   }
