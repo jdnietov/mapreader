@@ -24,16 +24,17 @@ using namespace cv;
  * in Ubuntu 16.04.
 
  TODO: work on a solution to improve accuracy. Current error margins are:
- * lat error: +-0.00001319
- * lng error: +-0.0000742
+ * lat error: +-0.00001319  --> 0.0011
+ * lng error: +-0.0000742   --> 0.0023
 */
 
 const int    ZOOM      = 15;
-const int    PRECISION = 9;
+const int    PRECISION = 8;
 const int    DLOAD     = 5;         // progress bar module
-const double DELTALAT  = 0.022989;  // y-axis, increase upwards
-const double DELTALNG  = 0.041156;  // x-axis, decrease left
+const double DELTALAT  = 0.043014;  // y-axis, increase upwards
+const double DELTALNG  = 0.079144;  // x-axis, decrease left
 const char*  IMGNAME   = "screenshot.png";
+const char*  LOGNAME   = "data-mr.log";
 
 struct Location {
   double lat;
@@ -44,6 +45,7 @@ bool graphicMode, debugMode;
 ofstream bash, data;
 struct Location grid[Q];
 
+int checkDependencies();
 string currentDateTime();
 void chksyscall(char* line);
 void clean();
@@ -54,6 +56,10 @@ void printPoint(ofstream *ofs, float x, float y);
 void signalHandler( int signum );
 
 int main (int argc, char* argv[]) {
+  /* TODO: improve crash detection. Consider the following cases:
+  * - opencv is not installed
+  * - google-chrome is not installed
+  */
   if(argc > 1) {
     graphicMode = false;    
     debugMode = false;
@@ -71,7 +77,9 @@ int main (int argc, char* argv[]) {
   data.precision(PRECISION);
   cout.precision(PRECISION);
 
-  data.open("data.log", ios::app);
+  // checkDependencies();
+
+  data.open(LOGNAME, ios::app);
   data << "*** " << currentDateTime() << " ***" << endl;
   data.close();
 
@@ -106,7 +114,7 @@ int main (int argc, char* argv[]) {
     readAndMatch( (char*) IMGNAME, &points, graphicMode, debugMode );
 
     if(points.size() >= 1) {
-      data.open("data.log", ios::app);
+      data.open(LOGNAME, ios::app);
       for(vector<Point>::const_iterator pos = points.begin(); pos != points.end(); ++pos) {
         getCoordinates(pos->x+ICON/2, pos->y+ICON/2, lat, lng, &loc);
         cout << " |-- " << loc.lat << "," << loc.lng << endl;
@@ -118,6 +126,22 @@ int main (int argc, char* argv[]) {
       cout << endl;
     }
   }
+
+  return 0;
+}
+
+int checkDependencies() {
+  ofstream bash;
+
+  // check OpenCV version (check if installed)
+  bash.open("opencv_check.sh");
+  bash << "pkg-config --modversion opencv";
+  bash.close();
+
+  chksyscall("chmod +x opencv_check.sh");
+  chksyscall("./opencv_check.sh >> output.txt");
+
+  chksyscall( "./opencv_check.sh" );
 
   return 0;
 }
@@ -195,7 +219,7 @@ void signalHandler( int signum ) {
 }
 
 void clean() {
-  data.open("data.log", ios::app);
+  data.open(LOGNAME, ios::app);
   data << endl;
   data.close();
 

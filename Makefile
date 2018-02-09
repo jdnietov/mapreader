@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-I.
+CFLAGS=-w -I.
 OPCVFLAGS=`pkg-config --cflags --libs opencv`
 
-mapRead: main.cpp tmatch.cpp
-	$(CC) main.cpp tmatch.cpp -o mapRead $(CFLAGS) $(OPCVFLAGS)
+mapreader: main.cpp tmatch.cpp
+	$(CC) main.cpp tmatch.cpp -o mapreader $(CFLAGS) $(OPCVFLAGS)
